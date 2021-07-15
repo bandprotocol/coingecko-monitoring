@@ -1,9 +1,0 @@
-{
-    "SLUGS_MONITOR": {
-        "ARPA": "arpa-chain",
-        "BTCB": "bitcoin-bep2",
-        "BETH": "binance-eth"d,
-        "BETA": "binance-etaa",
-        "BETAA": "binance-etaaa"
-    }
-}
