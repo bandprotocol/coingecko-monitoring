@@ -1,22 +1,23 @@
+import os
 import requests
 import json
-import os
+import urllib
 
-from flask import Flask, jsonify
-from flask_apscheduler import APScheduler
+from flask import Flask
 
-# from notification.pager_duty import send_incident, catch_incident
+from notification.pager_duty import send_incident
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
 
 
 @app.route("/monitor_slugs", methods=["GET"])
-# @catch_incident
 def slugs_is_working():
     try:
-        f = open('slugs_monitor.json',)
-        data = json.load(f)
+        url = "https://raw.githubusercontent.com/bandprotocol/coingecko-monitoring/master/slugs_monitor.json"
+        response = urllib.request.urlopen(url)
+
+        data = json.loads(response.read())
         slugs_str = ",".join(list(data.get("SLUGS_MONITOR").values()))
         slugs = slugs_str.split(',')
         prices = requests.get(
@@ -31,17 +32,16 @@ def slugs_is_working():
                 if check is None:
                     error_slugs.append(slug)
 
-            # send_incident(
-            #     "Can't get some slug on coingecko", f"slugs {error_slugs} is failure")
+            send_incident(
+                "Can't get some slug on coingecko", f"slugs {error_slugs} is failure")
 
             return f"Can't get some slug on coingecko --> {error_slugs} is failure"
 
-    except json.decoder.JSONDecodeError:
-        # send_incident(
-        #     Can't docode json, There was a problem accessing the json data)
-        return "Can't docode json, There was a problem accessing the json data"
+        return "everything good"
 
-    return "everything good"
+    except Exception as e:
+        send_incident("Slugs monitoring error", str(e))
+        return f"Slugs monitoring error, {str(e)}", 500
 
 
 app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
