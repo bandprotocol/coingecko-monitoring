@@ -16,7 +16,6 @@ def slugs_is_working():
     try:
         url = "https://raw.githubusercontent.com/bandprotocol/coingecko-monitoring/master/slugs_monitor.json"
         response = urllib.request.urlopen(url)
-
         data = json.loads(response.read())
         slugs_str = ",".join(list(data.get("SLUGS_MONITOR").values()))
         slugs = slugs_str.split(',')
