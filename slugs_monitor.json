@@ -203,8 +203,6 @@
         "MVL": "mass-vehicle-ledger",
         "ARPA": "arpa-chain",
         "BTCB": "bitcoin-bep2",
-        "BETH": "binance-eth",
-        "BETA": "binance-etaa",
-        "BETAA": "binance-etaaa"
+        "BETH": "binance-eth"
     }
 }
