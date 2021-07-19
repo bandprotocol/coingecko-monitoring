@@ -1,23 +1,22 @@
 import os
 import requests
 import json
-import urllib
 
 from flask import Flask
 
-from notification.pager_duty import send_incident
+# from notification.pager_duty import send_incident
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
 
 
-@app.route("/monitor_slugs", methods=["GET"])
+@app.route("/", methods=["GET"])
 def slugs_is_working():
     try:
-        url = "https://raw.githubusercontent.com/bandprotocol/coingecko-monitoring/master/slugs_monitor.json"
-        response = urllib.request.urlopen(url)
-        data = json.loads(response.read())
-        slugs_str = ",".join(list(data.get("SLUGS_MONITOR").values()))
+        url = "https://raw.githubusercontent.com/bandprotocol/coingecko-monitoring/master/slugs.json"
+        response = requests.get(url)
+        data = response.json()
+        slugs_str = ",".join(list(data.values()))
         slugs = slugs_str.split(',')
         prices = requests.get(
             "https://api.coingecko.com/api/v3/simple/price",
@@ -31,15 +30,15 @@ def slugs_is_working():
                 if check is None:
                     error_slugs.append(slug)
 
-            send_incident(
-                "Can't get some slug on coingecko", f"slugs {error_slugs} is failure")
+            # send_incident(
+            #     "Can't get some slug on coingecko", f"slugs {error_slugs} is failure")
 
             return f"Can't get some slug on coingecko --> {error_slugs} is failure"
 
-        return "everything good"
+        return ""
 
     except Exception as e:
-        send_incident("Slugs monitoring error", str(e))
+        # send_incident("Slugs monitoring error", str(e))
         return f"Slugs monitoring error, {str(e)}", 500
 
 
