@@ -1,6 +1,5 @@
 import os
 import requests
-import json
 
 from flask import Flask
 
@@ -16,30 +15,29 @@ def slugs_is_working():
         url = "https://raw.githubusercontent.com/bandprotocol/coingecko-monitoring/master/slugs.json"
         response = requests.get(url)
         data = response.json()
-        slugs_str = ",".join(list(data.values()))
-        slugs = slugs_str.split(',')
+        slugs = list(data.values())
         prices = requests.get(
             "https://api.coingecko.com/api/v3/simple/price",
-            params={"ids": slugs_str, "vs_currencies": "USD"},
+            params={"ids": ",".join(slugs), "vs_currencies": "USD"},
         ).json()
 
         if len(slugs) != len(prices):
             error_slugs = []
             for slug in slugs:
+                print(slug)
                 check = prices.get(slug)
                 if check is None:
                     error_slugs.append(slug)
 
             send_incident(
-                "Can't get some slug on coingecko", f"slugs {error_slugs} is failure")
+                "Can't get some slug on coingecko", f"slugs {error_slugs} is failure", high=False)
 
             return f"Can't get some slug on coingecko --> {error_slugs} is failure"
 
         return ""
 
     except Exception as e:
-        send_incident("Slugs monitoring error", str(e))
+        send_incident("Slugs monitoring error", str(e), high=False)
         return f"Slugs monitoring error, {str(e)}", 500
-
 
 app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
