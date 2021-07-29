@@ -4,7 +4,7 @@ import json
 
 from flask import Flask
 
-# from notification.pager_duty import send_incident
+from notification.pager_duty import send_incident
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
@@ -30,15 +30,15 @@ def slugs_is_working():
                 if check is None:
                     error_slugs.append(slug)
 
-            # send_incident(
-            #     "Can't get some slug on coingecko", f"slugs {error_slugs} is failure")
+            send_incident(
+                "Can't get some slug on coingecko", f"slugs {error_slugs} is failure")
 
             return f"Can't get some slug on coingecko --> {error_slugs} is failure"
 
         return ""
 
     except Exception as e:
-        # send_incident("Slugs monitoring error", str(e))
+        send_incident("Slugs monitoring error", str(e))
         return f"Slugs monitoring error, {str(e)}", 500
 
 
